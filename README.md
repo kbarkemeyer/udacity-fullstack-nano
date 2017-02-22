@@ -1,1 +1,1 @@
-# udacity-fullstack-nano
+## Projects for the Udacity [Full Stack Web Developer Nanodegree](https://classroom.udacity.com/nanodegrees/nd004/syllabus)
