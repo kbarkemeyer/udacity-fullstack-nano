@@ -1,7 +1,7 @@
 import httplib
 import json
 
-api_key = "[YOUR API KEY GOES HERE]"
+api_key = "[YOUR API KEY]"
 
 
 def movie_storyline(movie_title):

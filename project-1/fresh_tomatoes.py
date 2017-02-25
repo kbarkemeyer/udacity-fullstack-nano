@@ -152,17 +152,18 @@ main_page_content = '''
     <!-- Main Page Content -->
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #083a6b;" role="navigation">
-            <div class = container-fluid>
+            <div class="container-fluid">
                 <a class="navbar-brand" href="#">Fresh Tomatoes Movie Trailers</a>
                 <ul class= "nav navbar-nav">
                     <li><a href="https://github.com/kbarkemeyer/udacity-fullstack-nano.git/">View on Github</a></li>
                     <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Movie Sites</span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Movie Sites</a>
                         <ul class="dropdown-menu">
                             <li><a href="https://www.themoviedb.org/?language=en">The Movie Database</a></li>
                             <li><a href="https://www.rottentomatoes.com/">Rotten Tomatoes</a></li>
                             <li><a href="http://www.imdb.com/">IMDb</a></li>
                         </ul>
+                    </li>
                 </ul>
             </div>
         </nav>
