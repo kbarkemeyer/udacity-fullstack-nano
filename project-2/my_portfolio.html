@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>portfolio</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/jquery-3.1.0.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/tooltip.js"></script>
+  </head>
+
+  <body>
+
+    <div class="container"> 
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" data-toggle="tooltip" data-placement="" title="karenbarkemeyer@gmail.com">KaBa</a>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+                <a href="https://github.com/kbarkemeyer/udacity-fullstack-nano.git">Github</a>
+              </li>
+              <li>
+                <a href="https://kbarkemeyer.github.io/fresh-tomatoes-movie-trailers/">Fav Movies</a>
+              </li>
+            </ul>
+         </div> 
+        </div>
+      </nav>
+      
+
+       
+      <div class="row">
+        <div class="col-md-4"><img src="images/spiral.JPG" alt="portfolio logo" class= "title-logo img-responsive">
+        </div>
+        <div class="col-md-8 text-right text-uppercase">
+          <h1 class="title-super text-thin">Karen Barkemeyer</h1>
+          <h4 data-toggle="tooltip" data-placement="" title="one differing from itself">hen diapheron heautoi</h4>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr class="style-four">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <img src="images/ocean.JPG" width="100%" class="img-responsive">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="text-muted">Featured Work</h2>
+        </div>
+      </div>
+      <div class="row text-center">
+        <div class="col-md-3">
+          <img src="images/tomatoes.jpg" width="100%" class="img-responsive" data-toggle="modal" data-target="#image1">
+          <h3 class="text-uppercase">Movies</h3>
+          <p><a href="https://kbarkemeyer.github.io/fresh-tomatoes-movie-trailers/">Favorite movies demo</a></p>
+        </div>
+        <div class="col-md-3">
+          <img src="images/desk-laptop.JPG" width="100%" class="img-responsive" data-toggle="modal" data-target="#image2">
+          <h3 class="text-uppercase">Full Stack</h3>
+          <p><a href="https://github.com/kbarkemeyer/udacity-fullstack-nano.git">Work on Github</a></p>
+        </div>
+        <div class="col-md-3">
+          <img src="images/willamette.jpg" width="100%" class="img-responsive" data-toggle="modal" data-target="#image3">
+          <h3 class="text-uppercase">Deutsch</h3>
+          <p><a href="https://willamette.edu">Willamette University</a></p>
+        </div>
+        <div class="col-md-3">
+          <img src="images/ucsb_campus.jpg" width="100%" class="img-responsive" data-toggle="modal" data-target="#image4">
+          <h3>UCSB</h3>
+          <p><a href="http://ucsb.edu">Alma Mater</a></p>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="image1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="myModalLabel">Fresh Tomatoes Movie Trailers</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="images/tomatoes.jpg" width="100%" class="img-responsive">
+                    <p>My first Udacity Project is a website where you can preview some of my favorite movies and watch their trailers.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="image2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="myModalLabel">Online Computer Student</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="images/desk-laptop.JPG" width="100%" class="img-responsive">
+                    <p>I have been taking online computer courses at MIT, Stanford, Udacity and Coursera since September 2016. Some of my projects are on Github!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="image3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="myModalLabel">My former profession</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="images/willamette.jpg" width="100%" class="img-responsive">
+                    <p>I have worked as a German professor and instructor for over 7 years, most recently as a Visiting Assistant Professor at Willamette University in Salem, OR from 2013 to 2016.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="image4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="myModalLabel">Education</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="images/ucsb_campus.jpg" width="100%" class="img-responsive">
+                    <p>I received my PhD in German Literature and Philosophy at the University of California, Santa Barbara in 2001.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <div class="row text-center">
+          <p class="text-muted"> &#169; 2017 Karen Barkemeyer</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
