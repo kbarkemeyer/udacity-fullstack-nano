@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>
+	<a href="/blog/{{post.key().id()}}">Back to post</a>
+</div>
+
+<br>
+
+
+{% if uid == None %}
+		{{ post.render() | safe }}
+		<br><br>
+
+	{% else %}
+		{% if uid == post.creator_uid %}
+			{{ post.render_own_post() | safe }}
+			<br><br>
+
+		{% else %}
+			{% if uid in post.user_liked %}
+				{{p.render_liked_post() | safe}}
+				<br><br>
+
+			{% else %}
+				{{post.render_user_post() | safe}}
+				<br><br>
+
+			{% endif %}
+
+		{% endif %}
+		
+	{% endif %}
+			
+<form method="post">
+	<div class="message">{{message}} &nbsp;<span><input type="submit" value="Yes"></span></div>
+</form>		
+
+{% endblock %}
+

@@ -1,0 +1,44 @@
+<div class="post">
+	<div class="post-heading">
+		<div class="post-title">
+			<a href="/blog/{{p.key().id()}}"> {{p.subject}}</a>
+			<span class="post-creator"> by {{p.creator_name}}</span>
+		</div>
+		<div class="post-date">
+			{{p.created.strftime("%b, %d, %Y")}}
+		</div>
+	</div>
+
+	<div class="post-content">
+		{{p._render_text | safe}}
+	</div>
+</div>
+
+<hr>
+
+<div>
+	<a href="/blog/edit/{{p.key().id()}}" class="button">Edit</a>
+	<a href="/blog/delete/{{p.key().id()}}" class="button">Delete</a>
+	<a href="/blog/comment/{{p.key().id()}}" class="button">Comment</a>
+</div>
+
+<hr>
+
+<div class="heart">&#x2764; &nbsp;<span class="likes">{{p.likes}}</span></div>
+
+<hr>
+
+<div class="comment">
+	{% for c in p.comments %}
+		<div class="transbox">
+			{{c.comment_author}}:
+			<br>
+			{{c.comment_text | safe}}
+			<br>
+		</div>
+		<div>
+			<a href="/blog/comment/edit/{{c.key().id()}}" class="button">Edit</a>
+			<a href="/blog/comment/delete/{{c.key().id()}}" class="button">Delete</a>
+		</div>
+	{% endfor %}
+</div>

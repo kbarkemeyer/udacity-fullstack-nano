@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% for p in posts %}
+
+		{% if uid == None %}
+			{{ p.render() | safe }}
+			<br><br>
+
+		{% else %}
+			{% if uid == p.creator_uid %}
+				{{ p.render_own_post() | safe }}
+				<br><br>
+
+			{% else %}
+				{% if uid in p.user_liked %}
+					{{p.render_liked_post() | safe}}
+					<br><br>
+
+				{% else %}
+					{{p.render_user_post() | safe}}
+					<br><br>
+
+				{% endif %}
+
+			{% endif %}
+
+		{% endif %}
+
+
+	{% endfor %}
+
+	<div>
+  		<a class="button new-post" href="/blog/newpost">Create a new post</a>
+  	</div>
+
+{% endblock %}

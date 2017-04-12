@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<div>
+		<a href="/blog">Back to blog</a>
+	</div>
+
+	<br>
+
+	{% if uid == None %}
+		{{ post.render() | safe }}
+		<br><br>
+
+	{% else %}
+		{% if uid == post.creator_uid %}
+			{{ post.render_own_post() | safe }}
+			<br><br>
+
+		{% else %}
+			{% if uid in post.user_liked %}
+				{{post.render_liked_post() | safe}}
+				<br><br>
+
+			{% else %}
+				{{post.render_user_post() | safe}}
+				<br><br>
+
+			{% endif %}
+
+		{% endif %}
+		
+	{% endif %}
+
+	<br>
+	<div class="error">{{error}}</div>
+
+{% endblock %}

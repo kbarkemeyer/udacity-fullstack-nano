@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+
+  <title>Fullstack Blog</title>
+</head>
+
+<body>
+  <a href="/blog" class="main-title">
+    Fullstack Blog
+  </a>
+
+  <div class="login-area">
+    {% if user %}
+      {{user.name}} (<a class="login-link" href="/logout">logout</a>)
+      <br><br>
+    {% else %}
+      <a class="login-link" href="/login">login</a>
+      |
+      <a class="login-link" href="/signup">signup</a>
+    {% endif %}
+  </div>
+
+  <div id="content">
+  {% block content %}
+  {% endblock %}
+  </div>
+
+  
+<script src="/js/jquery.min.js"></script>
+<script src="/js/script1.js"></script>
+
+</body>
+
+</html>
+
