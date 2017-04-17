@@ -1,48 +1,25 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <title>Login</title>
-    <style type="text/css">
-      .label {text-align: right}
-      .error {color: red}
-    </style>
+{% block content %}
 
-  </head>
+<h2>Login</h2>
+<form method="post">
+  <label>Username</label>
+    <input type="text" name="username" value="{{username}}">
 
-  <body>
-    <h2>Login</h2>
-    <form method="post">
-      <table>
-        <tr>
-          <td class="label">
-            Username
-          </td>
-          <td>
-            <input type="text" name="username" value="{{username}}">
-          </td>
-        </tr>
+<label>Password</label>
+  <input type="password" name="password" value="">
 
-        <tr>
-          <td class="label">
-            Password
-          </td>
-          <td>
-            <input type="password" name="password" value="">
-          </td>
-        </tr>
-      </table>
+<div class="error">
+  {{error}}
+</div>
 
-      <div class="error">
-        {{error}}
-      </div>
+<br>
 
-      <input type="submit">
-    </form>
-    <br>
-    <div>
-      <a href="/signup" class="login-signup-link">Signup</a>
+<input type="submit">
+</form>
+<br>
+<div>
+  <a href="/signup" class="login-signup-link">Signup</a>
 
-  </body>
-
-</html>
+{% endblock %}

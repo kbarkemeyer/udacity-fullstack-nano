@@ -1,15 +1,18 @@
 import os
 import re
-import random
-import hashlib
 import hmac
 
-from string import letters
+from functools import wraps
+
+from models import User
+from models import Post
+from models import Comment
+
+from google.appengine.ext import db
 
 import webapp2
 import jinja2
 
-from google.appengine.ext import db
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
@@ -18,10 +21,7 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
 secret = 'deissu'
 
 
-def render_str(template, **params):
-    t = jinja_env.get_template(template)
-    return t.render(params)
-
+# secure val functions
 
 def make_secure_val(val):
     return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
@@ -32,7 +32,71 @@ def check_secure_val(secure_val):
     if secure_val == make_secure_val(val):
         return val
 
+
+# decorator helper functions
+
+def post_exists(function):
+    @wraps(function)
+    def check_post(self, post_id):
+        key = db.Key.from_path('Post', int(post_id))
+        post = db.get(key)
+        status = 200
+        if post:
+            return function(self, post, status)
+        else:
+            status = 404
+            return function(self, post, status)
+    return check_post
+
+
+def user_owns_post(function):
+    @wraps(function)
+    def user_post(self, post, status):
+        uid = self.read_secure_cookie('user_id')
+        if status == 200:
+            creator_uid = post.creator_uid
+            if post.creator_uid == uid:
+                return function(self, post, uid, creator_uid, status)
+        else:
+            status = 404
+            return function(self, post, uid, status)
+    return user_post
+
+
+def comment_exists(function):
+    @wraps(function)
+    def comment(self, c_id):
+        c_key = db.Key.from_path('Comment', int(c_id))
+        c = db.get(c_key)
+        if c:
+            post_id = Comment.post.get_value_for_datastore(c).id()
+            p_key = db.Key.from_path('Post', int(post_id))
+            post = db.get(p_key)
+            status = 200
+            return function(self, status, c, post_id, post)
+        else:
+            status = 404
+            return function(self, status)
+    return comment
+
+
+def user_owns_comment(function):
+    @wraps(function)
+    def user_comment(self, status, c=None, post_id=None, post=None):
+        if status == 404:
+            return function(self, status)
+        else:
+            uid = self.read_secure_cookie('user_id')
+            if c.comment_uid == uid:
+                c_text = c.comment_text
+                return function(self, status, c, post, post_id, uid, c_text)
+            else:
+                return function(self, status, c, post, post_id, uid)
+    return user_comment
+
+
 # Main Blog handler
+
 
 class BlogHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
@@ -68,99 +132,7 @@ class BlogHandler(webapp2.RequestHandler):
         self.user = uid and User.by_id(int(uid))
 
 
-# user stuff
-
-def make_salt(length=5):
-    return ''.join(random.choice(letters) for x in xrange(length))
-
-
-def make_pw_hash(name, pw, salt=None):
-    if not salt:
-        salt = make_salt()
-    h = hashlib.sha256(name + pw + salt).hexdigest()
-    return '%s,%s' % (salt, h)
-
-
-def valid_pw(name, password, h):
-    salt = h.split(',')[0]
-    return h == make_pw_hash(name, password, salt)
-
-
-def users_key(group='default'):
-    return db.Key.from_path('users', group)
-
-
-class User(db.Model):
-    name = db.StringProperty(required=True)
-    pw_hash = db.StringProperty(required=True)
-    email = db.StringProperty()
-
-    @classmethod
-    def by_id(cls, uid):
-        return User.get_by_id(uid, parent=users_key())
-
-    @classmethod
-    def by_name(cls, name):
-        u = User.all().filter('name =', name).get()
-        return u
-
-    @classmethod
-    def register(cls, name, pw, email=None):
-        pw_hash = make_pw_hash(name, pw)
-        return User(parent=users_key(),
-                    name=name,
-                    pw_hash=pw_hash,
-                    email=email)
-
-    @classmethod
-    def login(cls, name, pw):
-        u = cls.by_name(name)
-        if u and valid_pw(name, pw, u.pw_hash):
-            return u
-
-# blog stuff
-# Add appropriate render functions
-
-
-class Post(db.Model):
-    subject = db.StringProperty(required=True)
-    content = db.TextProperty(required=True)
-    creator_uid = db.StringProperty(required=True)
-    creator_name = db.StringProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-    last_modified = db.DateTimeProperty(auto_now=True)
-    likes = db.IntegerProperty()
-    user_liked = db.StringListProperty()
-
-    def render(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("post.html", p=self)
-
-    def render_own_post(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("own_post.html", p=self)
-
-    def render_liked_post(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("liked_post.html", p=self)
-
-    def render_user_post(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("user_post.html", p=self)
-
-
-# Add Comment model, comments are reference properties which refer
-# to respective posts, thus establishing a many to one relationship.
-
-
-class Comment(db.Model):
-    post = db.ReferenceProperty(Post, collection_name='comments')
-    comment_text = db.TextProperty()
-    comment_author = db.TextProperty()
-    comment_uid = db.StringProperty(required=True)
-
-    def render_comment_text(self):
-        self.comment_text.replace('\n', '<br>')
+# Other Blog handlers
 
 
 class BlogFront(BlogHandler):
@@ -174,14 +146,10 @@ class BlogFront(BlogHandler):
 
 
 class PostPage(BlogHandler):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
-
-        if not post:
-            self.error(404)
-            return
-
+    @post_exists
+    def get(self, post, status):
+        if status == 404:
+            return self.redirect('/blog')
         else:
             if not self.user:
                 self.render("permalink.html", post=post, uid=None)
@@ -199,113 +167,125 @@ class NewPost(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
-        uid = self.read_secure_cookie('user_id')
-        current_user = User.by_id(int(uid))
-        name = current_user.name
-        subject = self.request.get('subject')
-        content = self.request.get('content')
-
-        if subject and content:
-            p = Post(subject=subject, content=content, creator_uid=uid,
-                     creator_name=name, likes=0)
-            p.put()
-            self.redirect('/blog/%s' % str(p.key().id()))
         else:
-            error = "subject and content, please!"
-            self.render("newpost.html", subject=subject, content=content,
-                        error=error)
+            uid = self.read_secure_cookie('user_id')
+            subject = self.request.get('subject')
+            content = self.request.get('content')
+
+            if subject and content:
+                p = Post(user=self.user, subject=subject, content=content,
+                         creator_uid=uid, likes=0)
+                p.put()
+                self.redirect('/blog/%s' % str(p.key().id()))
+            else:
+                error = "subject and content, please!"
+                self.render("newpost.html", subject=subject, content=content,
+                            error=error)
 
 
 # Add edit post handler
 
 
 class EditPost(NewPost):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
-        uid = self.read_secure_cookie('user_id')
+    @post_exists
+    @user_owns_post
+    def get(self, post, uid, status, creator_uid=None):
+        if status == 404:
+            return self.redirect("/blog")
 
-        if not post:
-            self.error(404)
-            return
-
-        if post.creator_uid == uid:
-            subject = post.subject
-            content = post.content
-
-            self.render("editpost.html", subject=subject, content=content,
-                        post=post)
-
-        else:
-            message = "You can only edit your own post!"
-            self.render("editpost.html", subject=subject, content=content,
-                        error=message)
-
-    def post(self, post_id):
         if not self.user:
-            self.redirect('/blog')
-
-        key = db.Key.from_path('Post', int(post_id))
-        p = db.get(key)
-        subject = self.request.get('subject')
-        content = self.request.get('content')
-
-        if subject and content:
-            p.subject = subject
-            p.content = content
-            p.put()
-            self.redirect('/blog/%s' % str(p.key().id()))
+            return self.redirect("/login")
 
         else:
-            error = "subject and content, please!"
-            self.render("editpost.html", subject=subject, content=content,
-                        error=error)
+            if not post.creator_uid:
+                message = "You can only edit your own post!"
+                self.render("permalink.html", post=post, uid=uid,
+                            error=message)
+
+            else:
+                subject = post.subject
+                content = post.content
+                self.render("editpost.html", subject=subject, content=content,
+                            post=post)
+
+    @post_exists
+    def post(self, post, status):
+        if status == 404:
+            return self.redirect("/blog")
+
+        if not self.user:
+            self.redirect('/login')
+
+        else:
+            subject = self.request.get('subject')
+            content = self.request.get('content')
+
+            if subject and content:
+                post.subject = subject
+                post.content = content
+                post.put()
+                self.redirect('/blog/%s' % str(post.key().id()))
+
+            else:
+                error = "subject and content, please!"
+                self.render("editpost.html", subject=subject, content=content,
+                            error=error)
 
 # Add delete post handler
 
 
 class DeletePost(BlogHandler):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
-        uid = self.read_secure_cookie('user_id')
+    @post_exists
+    @user_owns_post
+    def get(self, post, uid, status, creator_uid=None):
+        if status == 404:
+            return self.redirect("/blog")
 
-        if not post:
-            self.error(404)
-            return
-
-        if uid == post.creator_uid:
-            message = "Are you sure you want to delete this post?"
-            self.render("deletepost.html", post=post, uid=uid, message=message)
+        if not self.user:
+            return self.redirect("/login")
 
         else:
-            message = "You are not authorized to delete this post!"
-            self.render("permalink.html", post=post, uid=uid, error=message)
+            if not creator_uid:
+                message = "You are not authorized to delete this post!"
+                self.render("permalink.html", post=post, uid=uid,
+                            error=message)
 
-    def post(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
-        post_comments = post.comments.get()
-        if post_comments:
-            post_comments.delete()
-        post.delete()
-        self.redirect('/blog')
+            else:
+                message = "Are you sure you want to delete this post?"
+                self.render("deletepost.html", post=post, uid=uid,
+                            message=message)
+
+    @post_exists
+    def post(self, post, status):
+        if status == 404:
+            return self.redirect("/blog")
+
+        if not self.user:
+            return self.redirect("/login")
+
+        else:
+            post_comments = post.comments.get()
+            if post_comments:
+                post_comments.delete()
+            post.delete()
+            self.redirect('/blog')
 
 
 # Add like post handler
 
 
 class LikePost(BlogHandler):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
+    @post_exists
+    def get(self, post, status):
         uid = self.read_secure_cookie('user_id')
 
-        if not post:
-            self.error(404)
-            return
+        if status == 404:
+            return self.redirect("/blog")
+
+        if not self.user:
+            return self.redirect("/login")
 
         if uid == post.creator_uid:
             message = "You cannot like or unlike your own post!"
@@ -315,132 +295,151 @@ class LikePost(BlogHandler):
             message = "Please click on the buttons to like or dislike post!"
             self.render("permalink.html", post=post, uid=uid, error=message)
 
-    def post(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
+    @post_exists
+    def post(self, post, status):
         uid = self.read_secure_cookie('user_id')
 
-        if not post:
-            self.error(404)
-            return
+        if status == 404:
+            return self.redirect("/blog")
 
-        post.likes += 1
-        post.user_liked.append(uid)
-        post.put()
+        if not self.user:
+            return self.redirect("/login")
 
-    def delete(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
+        else:
+            post.user_liked.append(uid)
+            post.put()
+
+    @post_exists
+    def delete(self, post, status):
         uid = self.read_secure_cookie('user_id')
 
-        if not post:
-            self.error(404)
-            return
+        if status == 404:
+            return self.redirect("/blog")
 
-        post.likes -= 1
-        post.user_liked.remove(uid)
-        post.put()
+        if not self.user:
+            return self.redirect("/login")
+
+        else:
+            post.user_liked.remove(uid)
+            post.put()
 
 
 # Add comment handler
 
 
 class PostComment(BlogHandler):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
+    @post_exists
+    def get(self, post, status):
+        if status == 404:
+            return self.redirect("/blog")
 
-        if not post:
-            self.error(404)
-            return
+        if not self.user:
+            return self.redirect("/login")
 
-        self.render("postcomment.html", post=post)
+        else:
+            self.render("postcomment.html", post=post)
 
-    def post(self, post_id):
-        key = db.Key.from_path('Post', int(post_id))
-        post = db.get(key)
+    @post_exists
+    def post(self, post, status):
         uid = self.read_secure_cookie('user_id')
         current_user = User.by_id(int(uid))
 
+        if status == 404:
+            return self.redirect("/blog")
+
         if not self.user:
-            self.redirect('/blog')
+            return self.redirect("/login")
 
-        comment = self.request.get('comment')
-
-        if comment:
-            c = Comment(post=post, comment_text=comment,
-                        comment_author=current_user.name, comment_uid=uid)
-            c.put()
-            self.redirect('/blog')
         else:
-            self.redirect('/blog')
+            comment = self.request.get('comment')
+
+            if comment:
+                c = Comment(post=post, comment_text=comment,
+                            comment_author=current_user.name, comment_uid=uid)
+                c.put()
+                self.redirect('/blog')
+            else:
+                self.redirect('/blog')
 
 
 # Add edit comment handler
 
 
 class EditComment(BlogHandler):
-    def get(self, c_id):
-        c_key = db.Key.from_path('Comment', int(c_id))
-        c = db.get(c_key)
-        post_id = Comment.post.get_value_for_datastore(c).id()
-        p_key = db.Key.from_path('Post', int(post_id))
-        post = db.get(p_key)
-        uid = self.read_secure_cookie('user_id')
-
-        if not c:
-            self.error(404)
-            return
-        if c.comment_uid == uid:
-            c_text = c.comment_text
-            self.render("postcomment.html", comment=c_text, post=post)
-        else:
-            message = "You can only edit your own comment!"
-            self.render("permalink.html", uid=uid, post=post,
-                        error=message)
-
-    def post(self, c_id):
+    @comment_exists
+    @user_owns_comment
+    def get(self, status, c=None, post=None, post_id=None, uid=None,
+            c_text=None):
         if not self.user:
+            self.redirect('/login')
+
+        if status == 404:
             self.redirect('/blog')
 
-        c_key = db.Key.from_path('Comment', int(c_id))
-        c = db.get(c_key)
-        comment = self.request.get('comment')
-        post_id = Comment.post.get_value_for_datastore(c).id()
-
-        if comment:
-            c.comment_text = comment
-            c.put()
-            self.redirect('/blog/%s' % str(post_id))
         else:
-            message = "Content, please!"
-            self.render("postcomment.html", comment=comment, error=message)
+            if not c_text:
+                message = "You can only edit your own comment!"
+                self.render("permalink.html", uid=uid, post=post,
+                            comment=c_text, error=message)
+
+            else:
+                self.render("postcomment.html", uid=uid, comment=c_text,
+                            post=post)
+
+    @comment_exists
+    @user_owns_comment
+    def post(self, status, c=None, post=None, post_id=None, uid=None,
+             c_text=None):
+        if not self.user:
+            self.redirect('/login')
+
+        if status == 404:
+            self.redirect('/blog')
+
+        else:
+            if not c_text:
+                message = "You can only edit your own comment!"
+                self.render("permalink.html", uid=uid, post=post,
+                            error=message)
+
+            else:
+                comment = self.request.get('comment')
+                if comment:
+                    c.comment_text = comment
+                    c.put()
+                    self.redirect('/blog/%s' % str(post_id))
+                else:
+                    message = "Content, please!"
+                    self.render("postcomment.html", error=message)
 
 
 # Add delete comment handler
 
 
 class DeleteComment(BlogHandler):
-    def get(self, c_id):
-        c_key = db.Key.from_path('Comment', int(c_id))
-        c = db.get(c_key)
-        post_id = Comment.post.get_value_for_datastore(c).id()
-        p_key = db.Key.from_path('Post', int(post_id))
-        post = db.get(p_key)
-        uid = self.read_secure_cookie('user_id')
+    @comment_exists
+    @user_owns_comment
+    def get(self, status, c=None, post=None, post_id=None, uid=None,
+            c_text=None):
+        if not self.user:
+            self.redirect('/login')
 
-        if not c:
-            self.error(404)
-            return
-        if c.comment_uid == uid:
-            c.delete()
-            self.redirect('/blog/%s' % str(post_id))
+        if status == 404:
+            self.redirect('/blog')
+
         else:
-            message = "You can only delete your own comment!"
-            self.render("permalink.html", uid=uid, post=post, error=message)
+            if not c_text:
+                message = "You can only delete your own comment!"
+                self.render("permalink.html", uid=uid, post=post,
+                            error=message)
+
+            else:
+                c.delete()
+                self.redirect('/blog/%s' % str(post_id))
 
 
 # user signup
+
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 

@@ -20,7 +20,7 @@
 
 		{% else %}
 			{% if uid in post.user_liked %}
-				{{p.render_liked_post() | safe}}
+				{{post.render_liked_post() | safe}}
 				<br><br>
 
 			{% else %}

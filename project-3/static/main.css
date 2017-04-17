@@ -10,7 +10,7 @@ body {
 }
 
 .login-area {
-    font-size: 13px;
+    font-size: 14px;
     color: gray;
     position: absolute;
     top: 10px;
@@ -19,6 +19,7 @@ body {
 
 .login-signup-link {
     color: gray;
+    font-size: 16px;
     text-decoration: none;
 }
 
@@ -65,6 +66,13 @@ input[type=text] {
     font-family: monospace;
 }
 
+input[type=password] {
+    width: 500px;
+    font-size: 20px;
+    padding: 2px;
+    font-family: monospace;
+}
+
 textarea {
   width: 500px;
   height: 400px;
@@ -73,7 +81,7 @@ textarea {
 }
 
 input[type=submit] {
-  font-size: 14px;
+  font-size: 18px;
 }
 
 a {

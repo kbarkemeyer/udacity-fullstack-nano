@@ -2,7 +2,7 @@
 	<div class="post-heading">
 		<div class="post-title">
 			<a href="/blog/{{p.key().id()}}">{{p.subject}}</a>
-			<span class="post-creator"> by {{p.creator_name}}</span>
+			<span class="post-creator"> by {{p.user.name}}</span>
 		</div>
 		<div class="post-date">
 			{{p.created.strftime("%b, %d, %Y")}}
