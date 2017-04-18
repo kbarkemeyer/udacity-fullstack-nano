@@ -280,6 +280,7 @@ class LikePost(BlogHandler):
         if uid == post.creator_uid:
             message = "You cannot like your own post!"
             self.render("permalink.html", post=post, uid=uid, error=message)
+            return
 
         if uid in post.user_liked:
             message = "You can like a post only once!"
@@ -296,6 +297,7 @@ class LikePost(BlogHandler):
         if uid == post.creator_uid:
             message = "You cannot unlike your own post!"
             self.render("permalink.html", post=post, uid=uid, error=message)
+            return
 
         if uid not in post.user_liked:
             message = "You can unlike a post only after liking it first!"
