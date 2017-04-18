@@ -35,31 +35,37 @@ def check_secure_val(secure_val):
 
 # decorator helper functions
 
+def login_required(function):
+    @wraps(function)
+    def login(self, *args, **kwargs):
+        if not self.user:
+            self.redirect("/login")
+        else:
+            function(self, *args, **kwargs)
+    return login
+
+
 def post_exists(function):
     @wraps(function)
     def check_post(self, post_id):
         key = db.Key.from_path('Post', int(post_id))
         post = db.get(key)
-        status = 200
-        if post:
-            return function(self, post, status)
+        if not post:
+            self.redirect("/blog")
         else:
-            status = 404
-            return function(self, post, status)
+            return function(self, post)
     return check_post
 
 
 def user_owns_post(function):
     @wraps(function)
-    def user_post(self, post, status):
+    def user_post(self, post):
         uid = self.read_secure_cookie('user_id')
-        if status == 200:
-            creator_uid = post.creator_uid
-            if post.creator_uid == uid:
-                return function(self, post, uid, creator_uid, status)
+        creator_uid = post.creator_uid
+        if post.creator_uid == uid:
+            function(self, post, uid, creator_uid)
         else:
-            status = 404
-            return function(self, post, uid, status)
+            function(self, post, uid)
     return user_post
 
 
@@ -68,30 +74,25 @@ def comment_exists(function):
     def comment(self, c_id):
         c_key = db.Key.from_path('Comment', int(c_id))
         c = db.get(c_key)
-        if c:
+        if not c:
+            self.redirect("/blog")
+        else:
             post_id = Comment.post.get_value_for_datastore(c).id()
             p_key = db.Key.from_path('Post', int(post_id))
             post = db.get(p_key)
-            status = 200
-            return function(self, status, c, post_id, post)
-        else:
-            status = 404
-            return function(self, status)
+            function(self, c, post_id, post)
     return comment
 
 
 def user_owns_comment(function):
     @wraps(function)
-    def user_comment(self, status, c=None, post_id=None, post=None):
-        if status == 404:
-            return function(self, status)
+    def user_comment(self, c, post_id, post):
+        uid = self.read_secure_cookie('user_id')
+        if c.comment_uid == uid:
+            c_text = c.comment_text
+            return function(self, c, post, post_id, uid, c_text)
         else:
-            uid = self.read_secure_cookie('user_id')
-            if c.comment_uid == uid:
-                c_text = c.comment_text
-                return function(self, status, c, post, post_id, uid, c_text)
-            else:
-                return function(self, status, c, post, post_id, uid)
+            return function(self, c, post, post_id, uid)
     return user_comment
 
 
@@ -147,76 +148,63 @@ class BlogFront(BlogHandler):
 
 class PostPage(BlogHandler):
     @post_exists
-    def get(self, post, status):
-        if status == 404:
-            return self.redirect('/blog')
+    def get(self, post):
+        if not self.user:
+            self.render("permalink.html", post=post, uid=None)
         else:
-            if not self.user:
-                self.render("permalink.html", post=post, uid=None)
-            else:
-                uid = self.read_secure_cookie('user_id')
-                self.render("permalink.html", post=post, uid=uid)
+            uid = self.read_secure_cookie('user_id')
+            self.render("permalink.html", post=post, uid=uid)
 
 
 class NewPost(BlogHandler):
+    @login_required
     def get(self):
-        if self.user:
-            self.render("newpost.html")
-        else:
-            self.redirect("/login")
+        self.render("newpost.html")
 
+    @login_required
     def post(self):
-        if not self.user:
-            self.redirect('/login')
+        uid = self.read_secure_cookie('user_id')
+        subject = self.request.get('subject')
+        content = self.request.get('content')
 
+        if subject and content:
+            p = Post(user=self.user, subject=subject, content=content,
+                     creator_uid=uid, likes=0)
+            p.put()
+            self.redirect('/blog/%s' % str(p.key().id()))
         else:
-            uid = self.read_secure_cookie('user_id')
-            subject = self.request.get('subject')
-            content = self.request.get('content')
-
-            if subject and content:
-                p = Post(user=self.user, subject=subject, content=content,
-                         creator_uid=uid, likes=0)
-                p.put()
-                self.redirect('/blog/%s' % str(p.key().id()))
-            else:
-                error = "subject and content, please!"
-                self.render("newpost.html", subject=subject, content=content,
-                            error=error)
+            error = "subject and content, please!"
+            self.render("newpost.html", subject=subject, content=content,
+                        error=error)
 
 
 # Add edit post handler
 
 
 class EditPost(NewPost):
+    @login_required
     @post_exists
     @user_owns_post
-    def get(self, post, uid, status, creator_uid=None):
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
+    def get(self, post, uid, creator_uid=None):
+        if not creator_uid:
+            message = "You can only edit your own post!"
+            self.render("permalink.html", post=post, uid=uid,
+                        error=message)
 
         else:
-            if not post.creator_uid:
-                message = "You can only edit your own post!"
-                self.render("permalink.html", post=post, uid=uid,
-                            error=message)
+            subject = post.subject
+            content = post.content
+            self.render("editpost.html", subject=subject, content=content,
+                        post=post)
 
-            else:
-                subject = post.subject
-                content = post.content
-                self.render("editpost.html", subject=subject, content=content,
-                            post=post)
-
+    @login_required
     @post_exists
-    def post(self, post, status):
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            self.redirect('/login')
+    @user_owns_post
+    def post(self, post, uid, creator_uid=None):
+        if not creator_uid:
+            message = "You can only edit your own post!"
+            self.render("permalink.html", post=post, uid=uid,
+                        error=message)
 
         else:
             subject = self.request.get('subject')
@@ -237,33 +225,28 @@ class EditPost(NewPost):
 
 
 class DeletePost(BlogHandler):
+    @login_required
     @post_exists
     @user_owns_post
-    def get(self, post, uid, status, creator_uid=None):
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
+    def get(self, post, uid, creator_uid=None):
+        if not creator_uid:
+            message = "You are not authorized to delete this post!"
+            self.render("permalink.html", post=post, uid=uid,
+                        error=message)
 
         else:
-            if not creator_uid:
-                message = "You are not authorized to delete this post!"
-                self.render("permalink.html", post=post, uid=uid,
-                            error=message)
+            message = "Are you sure you want to delete this post?"
+            self.render("deletepost.html", post=post, uid=uid,
+                        message=message)
 
-            else:
-                message = "Are you sure you want to delete this post?"
-                self.render("deletepost.html", post=post, uid=uid,
-                            message=message)
-
+    @login_required
     @post_exists
-    def post(self, post, status):
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
+    @user_owns_post
+    def post(self, post, uid, creator_uid=None):
+        if not creator_uid:
+            message = "You are not authorized to delete this post!"
+            self.render("permalink.html", post=post, uid=uid,
+                        error=message)
 
         else:
             post_comments = post.comments.get()
@@ -277,47 +260,46 @@ class DeletePost(BlogHandler):
 
 
 class LikePost(BlogHandler):
+    @login_required
     @post_exists
-    def get(self, post, status):
+    def get(self, post):
         uid = self.read_secure_cookie('user_id')
-
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
 
         if uid == post.creator_uid:
             message = "You cannot like or unlike your own post!"
             self.render("permalink.html", post=post, uid=uid, error=message)
 
         else:
-            message = "Please click on the buttons to like or dislike post!"
+            message = "Please click on the buttons to like or unlike post!"
             self.render("permalink.html", post=post, uid=uid, error=message)
 
+    @login_required
     @post_exists
-    def post(self, post, status):
+    def post(self, post):
         uid = self.read_secure_cookie('user_id')
+        if uid == post.creator_uid:
+            message = "You cannot like your own post!"
+            self.render("permalink.html", post=post, uid=uid, error=message)
 
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
+        if uid in post.user_liked:
+            message = "You can like a post only once!"
+            self.render("permalink.html", post=post, uid=uid, error=message)
 
         else:
             post.user_liked.append(uid)
             post.put()
 
+    @login_required
     @post_exists
-    def delete(self, post, status):
+    def delete(self, post):
         uid = self.read_secure_cookie('user_id')
+        if uid == post.creator_uid:
+            message = "You cannot unlike your own post!"
+            self.render("permalink.html", post=post, uid=uid, error=message)
 
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
+        if uid not in post.user_liked:
+            message = "You can unlike a post only after liking it first!"
+            self.render("permalink.html", post=post, uid=uid, error=message)
 
         else:
             post.user_liked.remove(uid)
@@ -328,137 +310,97 @@ class LikePost(BlogHandler):
 
 
 class PostComment(BlogHandler):
+    @login_required
     @post_exists
-    def get(self, post, status):
-        if status == 404:
-            return self.redirect("/blog")
+    def get(self, post):
+        self.render("postcomment.html", post=post)
 
-        if not self.user:
-            return self.redirect("/login")
-
-        else:
-            self.render("postcomment.html", post=post)
-
+    @login_required
     @post_exists
-    def post(self, post, status):
+    def post(self, post):
         uid = self.read_secure_cookie('user_id')
         current_user = User.by_id(int(uid))
+        comment = self.request.get('comment')
 
-        if status == 404:
-            return self.redirect("/blog")
-
-        if not self.user:
-            return self.redirect("/login")
-
+        if comment:
+            c = Comment(post=post, comment_text=comment,
+                        comment_author=current_user.name, comment_uid=uid)
+            c.put()
+            self.redirect('/blog/%s' % str(post.key().id()))
         else:
-            comment = self.request.get('comment')
-
-            if comment:
-                c = Comment(post=post, comment_text=comment,
-                            comment_author=current_user.name, comment_uid=uid)
-                c.put()
-                self.redirect('/blog')
-            else:
-                self.redirect('/blog')
+            self.redirect('/blog')
 
 
 # Add edit comment handler
 
 
 class EditComment(BlogHandler):
+    @login_required
     @comment_exists
     @user_owns_comment
-    def get(self, status, c=None, post=None, post_id=None, uid=None,
-            c_text=None):
-        if not self.user:
-            self.redirect('/login')
-
-        if status == 404:
-            self.redirect('/blog')
+    def get(self, c, post, post_id, uid, c_text=None):
+        if not c_text:
+            message = "You can only edit your own comment!"
+            self.render("permalink.html", uid=uid, post=post,
+                        comment=c_text, error=message)
 
         else:
-            if not c_text:
-                message = "You can only edit your own comment!"
-                self.render("permalink.html", uid=uid, post=post,
-                            comment=c_text, error=message)
+            self.render("postcomment.html", uid=uid, comment=c_text,
+                        post=post)
 
-            else:
-                self.render("postcomment.html", uid=uid, comment=c_text,
-                            post=post)
-
+    @login_required
     @comment_exists
     @user_owns_comment
-    def post(self, status, c=None, post=None, post_id=None, uid=None,
-             c_text=None):
-        if not self.user:
-            self.redirect('/login')
-
-        if status == 404:
-            self.redirect('/blog')
+    def post(self, c, post, post_id, uid, c_text=None):
+        if not c_text:
+            message = "You can only edit your own comment!"
+            self.render("permalink.html", uid=uid, post=post,
+                        error=message)
 
         else:
-            if not c_text:
-                message = "You can only edit your own comment!"
-                self.render("permalink.html", uid=uid, post=post,
-                            error=message)
-
+            comment = self.request.get('comment')
+            if comment:
+                c.comment_text = comment
+                c.put()
+                self.redirect('/blog/%s' % str(post_id))
             else:
-                comment = self.request.get('comment')
-                if comment:
-                    c.comment_text = comment
-                    c.put()
-                    self.redirect('/blog/%s' % str(post_id))
-                else:
-                    message = "Content, please!"
-                    self.render("postcomment.html", error=message)
+                message = "Content, please!"
+                self.render("postcomment.html", error=message)
 
 
 # Add delete comment handler
 
 
 class DeleteComment(BlogHandler):
+    @login_required
     @comment_exists
     @user_owns_comment
-    def get(self, status, c=None, post=None, post_id=None, uid=None,
-            c_text=None):
-        if not self.user:
-            self.redirect('/login')
-
-        if status == 404:
-            self.redirect('/blog')
+    def get(self, c, post, post_id, uid, c_text=None):
+        if not c_text:
+            message = "You can only delete your own comment!"
+            self.render("permalink.html", uid=uid, post=post,
+                        error=message)
 
         else:
-            if not c_text:
-                message = "You can only delete your own comment!"
-                self.render("permalink.html", uid=uid, post=post,
-                            error=message)
-
-            else:
-                c.delete()
-                self.redirect('/blog/%s' % str(post_id))
+            c.delete()
+            self.redirect('/blog/%s' % str(post_id))
 
 
 # user signup
 
 
-USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-
-
 def valid_username(username):
+    USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
     return username and USER_RE.match(username)
 
 
-PASS_RE = re.compile(r"^.{3,20}$")
-
-
 def valid_password(password):
+    PASS_RE = re.compile(r"^.{3,20}$")
     return password and PASS_RE.match(password)
 
 
-EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
-
-
 def valid_email(email):
+    EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
     return not email or EMAIL_RE.match(email)
 
 
