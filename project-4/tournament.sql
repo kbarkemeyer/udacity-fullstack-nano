@@ -6,7 +6,7 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
--- For testing puposes
+-- 
 DROP DATABASE IF EXISTS tournament;
 
 -- Creates database 
@@ -25,6 +25,7 @@ CREATE TABLE matches (
 	winner integer REFERENCES players(ID),
 	loser integer REFERENCES players(ID)
 );
+
 
 CREATE VIEW standings AS 
 	SELECT id, name,
