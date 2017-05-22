@@ -1,0 +1,55 @@
+{% extends "bookappMain.html" %}
+{% block content %}
+{% include "bookappHeader.html" %}
+
+<div class="row divider divider-brown">
+	<div class="col-md-12 col-sm-12"></div>
+</div>
+
+<div class="row banner main-banner">
+	<div class="col-md-1 col-sm-1 col-xs-1"></div>
+	<div class="col-md-9 col-sm-9 col-xs-9 padding-none">
+		<h1>The Bookbin App</h1>
+		<h2>Share and discover books that change everything!</h2>
+	</div>
+	
+</div>
+
+<div class = "flash">
+	{% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+	
+<div class="row padding-top padding-bottom">
+	<div class="col-md-4 col-sm-6">
+		<a href="{{url_for('newBookbin')}}">
+			<button class="btn btn-default">
+				<span class="glyphicon glyphicon-book" aria-hidden="true"></span>Create Bookbin
+			</button>
+		</a>
+	</div>
+	<div class="col-md-6"></div>
+</div>
+
+<div class="row">
+{% for bookbin in bookbins %}
+<div class="col-lg-3 col-md-4 col-xs-6 thumb">
+	<a class="thumbnail" href = "{{url_for('showBooks', bookbin_id = bookbin.id)}}">
+		<img class="img-responsive" src="/static/books-light.jpg">
+		<div class="bookbin-name">
+			<h3>{{bookbin.name}}</h3>
+		</div>
+	</a>
+</div>
+{% endfor %}
+</div>
+	
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "bookappMain.html" %}
+{% block content %}
+{% include "bookappHeader.html" %}
+<div class="row divider divider-yellow">
+		<div class="col-md-12 col-sm-12 col-xs-12"></div>
+</div>
+<div class="row banner book-banner-sm">
+	<div class="col-md-11 col-md-offset-1 col-sm-11 col-sm-offset-1 col-xs-11 col-xs-offset-1 padding-none">
+		<h2>New Book</h2>
+	</div>
+</div>
+
+<div class="flash">
+	{% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-1 padding-top">
+		<form action="#" method = "post">
+			<div class="form-group">
+				<div>
+					<label for="title">Title:</label>
+					<input type ="text" maxlength="100" class="form-control" id="title" name="title" placeholder="Book Title (Required)">
+				</div>
+				<div>
+					<label for="author">Author:</label>
+					<input type="text" maxlength="50" class="form-control" id="author" name="author" placeholder="Author's Name">
+				</div>
+				<div>
+					<label for="pub_year">Year Published:</label>
+					<input type="text" maxlength="50" class="form-control" id="pub_year" name="pub_year" placeholder="Year Published">
+				</div>
+				<div>
+				<label>Genre:</label>
+					<div class="radio">
+					  <label for="genre1">
+					    <input type="radio" name="genre" id="genre1" value="Fiction">Fiction
+					  </label>
+					</div>
+					<div class="radio">
+					  <label for="genre2">
+					    <input type="radio" name="genre" id="genre2" value="Nonfiction">Nonfiction
+					  </label>
+					</div>
+					<div class="radio">
+					  <label for="genre3">
+					    <input type="radio" name="genre" id="genre3" value="Defies Categorization" checked>Defies Categorization
+					  </label>
+					</div>
+				</div>
+				<div>
+					<label for="description">Description:</label>
+					<textarea class="form-control" maxlength="500" rows="10" name="description" placeholder="Book Description"></textarea>
+				</div>
+				<div>
+					<button type="submit" class="btn btn-default" id="submit">
+					<span class="glyphicon glyphicon-book" aria-hidden="true"></span>Create</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="row">
+		<div class="col-md-6 col-md-offset-1 col-sm-6 col-sm-offset-1 col-xs-6 col-xs-offset-1">
+		<a href = "{{url_for('showBooks', bookbin_id = bookbin_id)}}">
+		<button class="btn btn-default b-delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel</button>
+		</a>
+	</div>
+</div>
+
+{% endblock %}

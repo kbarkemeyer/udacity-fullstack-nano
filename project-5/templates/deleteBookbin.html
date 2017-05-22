@@ -1,0 +1,15 @@
+{% extends "bookappMain.html" %}
+{% block content %}
+{% include "bookappHeader.html" %}
+<h3> Are you sure you want to delete {{bookbin.name}}? All your books will be deleted as well! </h3>
+
+<form action="#" method = 'post'>
+	<button type="submit" class="btn btn-default b-delete" id="submit" type="submit">
+	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</button>
+</form>
+<br>
+<a href = "{{url_for('showBookbins', bookbin_id = bookbin.id)}}">
+	<button class="btn btn-default b-delete">
+	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel</button>
+</a>
+{% endblock %}

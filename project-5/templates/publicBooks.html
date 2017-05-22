@@ -1,0 +1,72 @@
+{% extends "bookappMain.html" %}
+{% block content %}
+{% include "bookappHeader.html" %}
+
+<div class="row divider divider-yellow">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner book-banner">
+		<div class="col-md-11  col-sm-11 col-xs-11 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 padding-none">
+			<h2>{{ bookbin.name }}</h2>
+			<h3>{{ creator }}</h3>
+
+		</div>
+	</div>
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1 col-sm-1 col-xs-1"></div>
+		<div class="col-md-11 col-sm-11 col-xs-11 padding-none">
+			
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+					<ul>
+						{% for message in messages %}
+							 <li> <strong> {{ message }} </strong> </li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			{% endwith %}
+		</div>
+	</div>
+
+	{% if books !=[] %}	
+		<div class="row">
+			{% for book in books %}
+				<div class="col-lg-3 col-md-4 col-xs-6 thumb">
+					<div class="thumbnail books">
+						<h4>{{book.title}}</h4>
+						<h5>{{book.author}}</h5>
+						<h5>{{book.pub_year}}</h5>
+						<h5>{{book.genre}}</h5>
+						<h5><a href = "#myBookModal{{book.id}}" data-toggle="modal">Description</a></h5>
+					</div>
+				</div>
+				<!-- Modal -->
+				<div id="myBookModal{{book.id}}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+
+				    <!-- Modal content-->
+				    <div class="modal-content" >
+				      <div class="modal-header">
+				        <button type="button" class="close" data-dismiss="modal">&times;</button>
+				        <h4 class="modal-title">{{book.title}}</h4>
+				      </div>
+				      <div class="modal-body">
+				      	<p>{{book.description}}</p>
+				      </div>
+				      <div class="modal-footer">
+				        <button type="button" class="btn-default btn-sm" data-dismiss="modal">Close</button>
+				      </div>
+				    </div>
+
+				  </div>
+				</div>
+			{% endfor %}
+		</div>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,269 @@
+body {
+	font-family: 'Inknut Antiqua', serif;
+	font-weight: 700;
+}
+
+h1 {
+	font-size: 40px;
+	color: #51453B;
+	line-height: 50px;
+	text-decoration: none;
+}
+
+h2 {
+	font-size: 24px;
+	color: #51453B;
+	line-height: 30px;
+	font-weight: 700;
+}
+
+h3 {
+	font-size: 18px;
+	color: #0f0f0f;
+	line-height: 20px;
+	font-weight: 700;
+}
+h4 {
+	font-size: 16px;
+	color: #0f0f0f;
+	line-height: 20px;
+	font-weight: 700;
+}
+ p {
+ 	font-family: 'Inknut Antiqua', serif;
+ 	font-size: 16px;
+ 	color: #0f0f0f;
+ 	line-height: 24px;
+ 	font-weight: 300;
+ }
+
+ strong {
+ 	font-size: 16px;
+ 	color: #7B7573;
+ 	line-height: 24px;
+ }
+
+ a {
+ 	font-size: 14px;
+ 	color: #0093B9;
+ 	line-height: 17px;
+ }
+.form-control {
+	margin-bottom: 15px;
+}
+
+.padding-top {
+	padding-top: 30px;
+}
+.padding-bottom {
+	padding-bottom: 30px;
+}
+.margin-right {
+	margin-right: 30px;
+}
+.padding-none {
+	padding: 0;
+}
+.btn {
+	padding: 20px;
+	margin-top: 0;
+	background: url("/static/pageswitholdprint -light.jpg");
+	font-size: 18px;
+	font-weight: 700;
+}
+.btn:hover {
+	border-color: #331a00;
+}
+.b-delete {
+	border-color: #aaaaaa;
+}
+.b-delete:hover {
+	border-color: #aaaaaa;
+	color: red;
+}
+.glyphicon {
+	margin-right: 10px;
+}
+.top-menu {
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+.top-menu p {
+	margin-bottom: 0;
+	line-height: 16px;
+}
+.top-menu a {
+	margin-bottom: 0;
+	line-height: 16px;
+	font-size: 16px;
+	color: #7B7573;
+	font-weight: 400;
+}
+.divider {
+	height: 10px;
+}
+.divider-brown {
+	background-color: #331a00;
+}
+.divider-yellow {
+	background-color: #FFB31A;
+}
+.main-banner {
+	height: 150px;
+	background: url("/static/bookBanner.jpg");
+	background-position: right;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+.book-banner-sm {
+	height: 75px;
+	background-color: #ffcc66;
+}
+.book-banner {
+	height: 100px;
+	background-color: #ffcc66;
+}
+.book {
+	padding: 20px;
+	margin: 20px;
+}
+.books {
+	background: url("/static/pageswitholdprint -light.jpg");
+}
+.creator {
+	padding-right: 20px;
+	margin-top: -20px;
+	text-align: right;
+	float:right;
+}
+.flash {
+	background-color: #f9db95;
+	text-decoration: none;
+	width: 100%;
+}
+.flash li {
+	list-style-type: none;
+	text-align: center;
+	width: 100%;
+}
+.thumbnail {
+	position: relative;
+}
+.bookbin-name {
+	top:10%;
+	left:10%;
+	right:10%;
+	bottom:10%;
+	position: absolute;
+}
+.modal-open, .modal, .btn:focus, a:focus {
+    outline:none;
+}
+
+@media only screen and (max-width: 997px) {
+
+	h1 {
+		font-size: 30px;
+		line-height: 40px;
+	}
+
+    h2 {
+		font-size: 18px;
+		line-height: 25px;
+		margin-top: 10px;
+	}
+
+	h3 {
+		font-size: 16px;
+	}
+
+	h4 {
+		font-size: 14px;
+	}
+
+	p {
+		font-size: 14px;
+	}
+	strong {
+		font-size: 14px;
+	}
+	.btn {
+	padding: 14px;
+	font-size: 14px;
+	}
+}
+
+@media only screen and (max-width: 768px) {
+
+	h1 {
+		font-size: 24px;
+		line-height: 40px;
+	}
+
+    h2 {
+		font-size: 16px;
+		line-height: 25px;
+		margin-top: 10px;
+	}
+
+	h3 {
+		font-size: 14px;
+	}
+
+	h4 {
+		font-size: 14px;
+	}
+
+	p {
+		font-size: 12px;
+	}
+	strong {
+		font-size: 12px;
+	}
+	.btn {
+	padding: 12px;
+	font-size: 12px;
+	}
+}
+
+@media only screen and (max-width: 425px) {
+
+	h1 {
+		font-size: 20px;
+		line-height: 30px;
+	}
+
+    h2 {
+		font-size: 16px;
+		line-height: 20px;
+		margin-top: 8px;
+	}
+
+	h3 {
+		font-size: 14px;
+	}
+
+	h4 {
+		font-size: 12px;
+	}
+
+	p {
+		font-size: 12px;
+	}
+	strong {
+		font-size: 12px;
+	}
+	.btn {
+		padding: 12px;
+		font-size: 12px;
+	}
+	.main-banner {
+		height: 100px;
+	}
+	.book-banner {
+		height: 75px;
+	}
+	.book-banner-sm {
+		height: 50px;
+	}
+}

@@ -1,0 +1,43 @@
+{% extends "bookappMain.html" %}
+{% block content %}
+{% include "bookappHeader.html" %}
+<div class="row divider divider-yellow">
+		<div class="col-md-12 col-sm-12 col-xs-12"></div>
+	</div>
+	<div class="row banner book-banner-sm">
+		<div class="col-md-11 col-md-offset-1 col-sm-11 col-sm-offset-1 col-xs-11 col-xs-offset-1 padding-none">
+			<h2>Edit {{bookbin.name}}</h2>
+		</div>
+	</div>
+
+<div class="flash">
+	{% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+	
+	<div class="row">
+		<div class="col-md-6 col-md-offset-1 padding-top">
+			<form action="{{ url_for('editBookbin',bookbin_id = bookbin.id)}}" method = "post">
+				<div class="form-group">
+					<label for="name">Name:</label>
+					<input type ="text" class="form-control" name="name" value="{{bookbin.name }}">
+					<div class="padding-bottom"></div>
+					<button type="submit" class="btn btn-default" id="submit" type="submit">
+					<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save</button>
+					<a href = "{{url_for('showBookbins', bookbin_id = bookbin.id)}}">
+						<button class="btn btn-default b-delete">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel</button>
+					</a>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

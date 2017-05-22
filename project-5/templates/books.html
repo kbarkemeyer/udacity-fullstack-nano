@@ -1,0 +1,89 @@
+{% extends "bookappMain.html" %}
+{% block content %}
+{% include "bookappHeader.html" %}
+
+<div class="row divider divider-yellow">
+		<div class="col-md-12 col-sm-12"></div>
+</div>
+<div class="row banner book-banner">
+	<div class="col-md-1 col-sm-1 col-xs-1"></div>
+	<div class="col-md-9 col-sm-9 col-xs-9 padding-none">
+		<h2>{{ bookbin.name }}</h2>
+		<h4>{{creator}}</h4>
+	</div>
+</div>
+
+<div class = 'flash'>
+		      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="row padding-top padding-bottom">
+	<div class="col-md-12 col-sm-12 col-xs-12 padding-none">
+		
+		<a href="{{url_for('newBook', bookbin_id = bookbin.id )}}">
+			<button class="btn btn-default" id="new-book">
+				<span class="glyphicon glyphicon-book" aria-hidden="true"></span>Add Book
+			</button>
+		</a>
+		<a href="{{url_for('editBookbin', bookbin_id = bookbin.id )}}">
+			<button class="btn btn-default" id="new-menu-item">
+				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit Bookbin
+			</button>
+		</a>
+		<a href="{{url_for('deleteBookbin', bookbin_id = bookbin.id )}}">
+			<button class="btn btn-default b-delete" id="delete-bookbin">
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Bookbin
+			</button>
+		</a>
+	</div>
+</div>
+	
+	{% if books !=[] %}	
+		<div class="row">
+			{% for book in books %}
+				<div class="col-lg-3 col-md-4 col-xs-6 thumb">
+					<div class="thumbnail books">
+							<h4>{{book.title}}</h4>
+							<h5>{{book.author}}</h5>
+							<h5>{{book.pub_year}}</h5>
+							<h5>{{book.genre}}</h5>
+							<h5><a href = "#myBookModal{{book.id}}" data-toggle="modal">Description</a></h5>
+							<a href='{{url_for('editBook', bookbin_id = bookbin.id, book_id=book.id ) }}'>Edit</a> | 
+							<a href='{{url_for('deleteBook', bookbin_id = bookbin.id, book_id=book.id ) }}'>Delete</a>
+					</div>
+				</div>
+				<!-- Modal -->
+				<div id="myBookModal{{book.id}}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+
+				    <!-- Modal content-->
+				    <div class="modal-content" >
+				      <div class="modal-header">
+				        <button type="button" class="close" data-dismiss="modal">&times;</button>
+				        <h4 class="modal-title">{{book.title}}</h4>
+				      </div>
+				      <div class="modal-body">
+				      	<p>{{book.description}}</p>
+				      </div>
+				      <div class="modal-footer">
+				        <button type="button" class="btn-default btn-sm" data-dismiss="modal">Close</button>
+				      </div>
+				    </div>
+
+				  </div>
+				</div>
+			{% endfor %}
+		</div>
+	{% endif %}
+
+
+{% endblock %}
