@@ -158,7 +158,7 @@ var ViewModel = function () {
         var LON = data.lon;
 
         var restaurantRequestTimeout = setTimeout(function () {
-            alert("An error occured. Failed to retrieve restaurant details.")}, 8000);
+            alert("An error occured. Failed to retrieve restaurant details.");}, 8000);
 
         // API call to zomato.com to retrieve necessary info and add it to restaurant-markers.
         $.ajax({
