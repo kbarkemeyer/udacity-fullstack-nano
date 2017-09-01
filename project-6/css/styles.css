@@ -1,0 +1,103 @@
+
+/* Making sure all parent elments of google map div are set to 100% .*/
+html, body, .main, .container-fluid, .map-canvas {
+     height: 100%;
+     width: 100%;
+     margin: 0;
+     padding: 0;
+}
+
+/*Makes sidebar take the height of the page content.*/
+.main {
+	display: flex;
+	align-items: stretch; 
+}
+
+.map-canvas {
+	overflow: hidden;
+	position: relative;
+	margin-bottom: 0;
+	height:100vh;
+	width: 100vw;
+}
+
+.map {
+	width: 100%;
+	height: 100%;
+}
+
+/* Making room for the navbar */
+body {
+  padding-top: 50px;
+}
+
+img {
+	height: 150px;
+	width: 254px;
+}
+
+.navbar-header {
+	margin-left: -10px;
+	width: 100%;
+}
+
+.location-filter {
+	position: relative;
+    display: block;
+    padding-left: 10px;
+    padding-top: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+}
+
+select {
+	font-weight: 500;
+    font-size: 16px;
+    color: #0d0d0d;
+}
+
+.address {
+	border-radius: 4px;
+	position: relative;
+    display: block;
+    padding: 10px 15px;
+    font-weight: 400;
+    font-size: 14px;
+    color: #428bca;
+}
+
+/* All styling of sidebar adapted from tutorial at https://bootstrapious.com/p/bootstrap-sidebar */
+
+#sidebar {
+  min-width: 250px;
+  max-width: 250px;
+  background-color: #2e353d;
+  float: left;
+  height:100vh;
+  position:relative;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+/* Sidebar disappears when button is clicked. */
+#sidebar.active {
+	margin-left: -250px;
+}
+
+#sidebar li {
+	clear: left;
+	font-weight: 600;
+	font-size: 16px;
+}
+
+/* off Canvas sidebar for smaller screens, reverses sidebar active to not appear on smaller screens unless button is clicked. */
+
+@media screen and (max-width: 639px) {
+	#sidebar {
+		margin-left: -250px;
+	}
+	#sidebar.active {
+		margin-left: 0;
+	}
+}

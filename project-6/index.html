@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neighborhood Map</title>
+    <meta name="description" content="Gluten-free restauants PDX">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    
+</head>
+
+<body>
+	<div class="container-fluid">
+        <!-- top navbar -->
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-header">
+                <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn pull-right">&#9776;</button>
+                <span class="navbar-brand">GLUTEN-FREE PDX</span>
+            </div>
+        </div>
+
+        <!-- main page wrapper -->
+        <div class="main">
+
+            <!-- sidebar -->
+            <nav id="sidebar">
+
+                <!-- location filter -->
+                <div class="location-filter">
+                    <h4>Filter Locations: <select data-bind="options: loc_filters, value: selected_loc">
+                    </select></h4>
+                </div>
+
+                <!-- list of restaurants -->
+                <ul class="nav" data-bind="foreach: filteredMarkers">
+                    <li>
+                        <a data-bind="click: $parent.showAddress">
+                        <div data-bind="text: title"></div></a>
+                        <p class="address" data-bind="visible: addressShown, text: address"></p>
+                    </li>
+                </ul> 
+
+            </nav>
+            
+            <!-- google map element -->
+            <div class="map-canvas">
+                <div class="map" id="pdxmap"></div>
+            </div>
+
+        </div>
+                
+    </div>
+
+    <script src="js/lib/jquery-3.1.0.js"></script>
+    <script 
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcYUpMvo89bLYwmqjerzQGGBV3Pd2aTCw&v=3">
+    </script>
+    <script src="js/lib/knockout-3.2.0.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/lib/bootstrap.min.js"></script>
+
+</body>
+
+</html>
