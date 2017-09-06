@@ -1,11 +1,3 @@
-function mapLoaded() {
-    initialize("withMap");
-}
-
-function mapNotLoaded() {
-    initialize("withoutMap")
-}
-
 function initialize(param) {
     var mapValue = param;
 
@@ -18,7 +10,20 @@ function initialize(param) {
     var ViewModel = function () {
         var self = this;
 
-        // If all goes well with google maps api proceed with default features. 
+        self.locFilters = ["ALL"];
+
+        // Create location filters dynamically.
+        restaurants.map(function (r) {
+            if (!self.locFilters.includes(r.location)) {
+                self.locFilters.push(r.location);
+            }
+        });
+
+        // Set intial filter to All to display all restaurantw.
+        self.selectedLoc = ko.observable("ALL");
+
+
+        // If all goes well with google maps api proceed with default features.
         if (mapValue === "withMap") {
             self.googleMapsError = ko.observable(false);
 
@@ -42,11 +47,10 @@ function initialize(param) {
             self.markers = ko.observableArray([]);
 
             /* Create a map marker for every restaurant in model and store in observable array.
-            * Add @params address and addressShown as an observable arrays for every restaurant/marker, 
+            * Add @params address and addressShown as an observable arrays for every restaurant/marker,
             * so address can be retrieved and displayed on click.
             * Add @params url and pic to be displayed on click in infowindow.
             */
-
             self.createMarker = function (name, location, latitude, longitude) {
                 var pos = new google.maps.LatLng(latitude, longitude);
                 var marker = new google.maps.Marker({
@@ -73,6 +77,7 @@ function initialize(param) {
                 self.createMarker(r.name, r.location, r.latitude, r.longitude);
             });
 
+            //Google info window.
             self.infoWindow = new google.maps.InfoWindow();
 
             // Function to display restaurant info on click.
@@ -84,7 +89,8 @@ function initialize(param) {
                 var LON = data.lon;
 
                 var restaurantRequestTimeout = setTimeout(function () {
-                    alert("An error occured. Failed to retrieve restaurant details.");}, 8000);
+                    alert("An error occured. Failed to retrieve restaurant details.");
+                }, 8000);
 
                 // API call to zomato.com to retrieve necessary info and add it to restaurant-markers.
                 $.ajax({
@@ -99,7 +105,7 @@ function initialize(param) {
                             data.pic = "Images/generic_photo.jpeg";
                         }
 
-                        // Create infowindow content.
+                        // Create info window content.
                         var windowContent = '<div id="content">'+
                             '<div id="siteNotice">'+
                             '</div>'+
@@ -121,12 +127,12 @@ function initialize(param) {
                             }
                         });
 
-                        // Close prior infowindow.
+                        // Close prior info window.
                         if (self.infoWindow) {
                             self.infoWindow.close();
                         }
 
-                        // Fill infowindow with new content.
+                        // Fill info window with new content.
                         self.infoWindow.setContent(windowContent);
 
                         // Go through filtered markers, set icon to appropriate color and open infowindow with new content.
@@ -151,24 +157,12 @@ function initialize(param) {
                 });
             };
 
-            self.locFilters = ["ALL"];
-
-            restaurants.map(r => {
-                if (!self.locFilters.includes(r.location)) {
-                    self.locFilters.push(r.location);
-                }
-            });
-
-            // Set intial filter to All to display all restaurantw.
-            self.selectedLoc = ko.observable("ALL");
-
-            /* 
+            /*
             * ko computed function to apply filter to markers array.
             * Returns array of filtered markers to be diplayed in sidebar.
             * Sets map markers to visible accordingly, so only selected restaurants are shown as markers on map.
             * Closes inforwindow on every new select, resets all markers to initial state if ALL is selected.
             */
-
             self.filteredMarkers = ko.computed(function () {
                 if (self.infoWindow) {
                     self.infoWindow.close();
@@ -198,52 +192,41 @@ function initialize(param) {
                 }
             });
 
-        } else { 
+        } else {
             // In case google map error just create list of restaurants and display error message instead of map.
 
-            self.googleMapsError = ko.observable(true); // Observable which takes boolean value to signal to knockout that google map error occurred.
+            // Observable which takes boolean value to signal to knockout that google map error occurred.
+            self.googleMapsError = ko.observable(true);
 
+            // Create simplified list of restaurants.
             self.restList = ko.observableArray([]);
 
-            for (r in restaurants) {
-                restaurants[r].title = restaurants[r].name;
-                restaurants[r].addressShown = false;
-                restaurants[r].address = "";
-            }
-
-            restaurants.forEach(function(rest) {
+            restaurants.forEach(function (rest) {
+                rest.title = rest.name;
+                rest.addressShown = false;
+                rest.address = "";
                 self.restList.push(rest);
             });
 
-            self.locFilters = ["ALL"];
-
-            restaurants.map(r => {
-                if (!self.locFilters.includes(r.location)) {
-                    self.locFilters.push(r.location);
-                }
-            });
-
-            self.selectedLoc = ko.observable("ALL");
-
+            // Simplified computed function just to display markers and filter according to location.
             self.filteredMarkers = ko.computed(function () {
                 if (self.selectedLoc() === "ALL") {
                     return self.restList();
                 } else {
-                    return ko.utils.arrayFilter(self.restList(), function(r) {
+                    return ko.utils.arrayFilter(self.restList(), function (r) {
                         return r.location === self.selectedLoc();
                     });
                 }
             });
-        }
+        } // End else condition.
 
         // Open or close sidebar and resize map accordingly on click.
-        
         self.activated = ko.observable(false);
-        
-        self.toggleActive = function() {
+
+        self.toggleActive = function () {
             self.activated(!self.activated());
             google.maps.event.trigger(self.pdxmap, "resize");
-        }
+        };
 
     };
 
@@ -251,3 +234,12 @@ function initialize(param) {
 
 }
 
+// Google maps callback function.
+function mapLoaded() {
+    initialize("withMap");
+}
+
+// Google onerror function.
+function mapNotLoaded() {
+    initialize("withoutMap");
+}
