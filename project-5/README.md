@@ -24,7 +24,7 @@ The webpage includes the following features:
 ### Installation and testing
 * Install Python, Flask and SQLAlchemy on your machine
 * Clone this repository.
-* Register as a seller with Amazon and retrieve your client_id and client_secret. Save both as a JSON object "a", under the file name 'amazon_client_id_secret.json' in the same folder as your app, like so:
+* Register as a developer with Amazon and retrieve your client_id and client_secret. Save both as a JSON object "a", under the file name 'amazon_client_id_secret.json' in the same folder as your app, like so:
 {
   "a": {
     "client_id": "YOUR_AMAZON_CLIENT_ID",
