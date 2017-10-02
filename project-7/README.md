@@ -56,6 +56,7 @@ To check if firewall working correctly check:
 ` sudo ufw status `
 
 Source:
+
 Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
 
 ## Give 'grader' access
@@ -78,8 +79,8 @@ Change file permissions:
 4. Open sshd_config file with ` sudo nano /etc/ssh/sshd_config `. To **disable root login** change PermitRootLogin to no, to **inforce key-based authentication** change PasswordAuthentication to no. Save. Restart ssh with ` sudo service ssh restart `.
 
 Sources:
-Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
 
+Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart]
 
 ## Prepare server to deploy catalog app
@@ -89,6 +90,7 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-create-a-s
 Check timezone with ` date `. If not UTC change to UTC with ` sudo timedatectl set-timezone UTC `. 
 
 Source:
+
 Askubuntu [https://askubuntu.com]
 
 ### Install Apache
@@ -127,6 +129,7 @@ host    all             all             ::1/128                 md5
 8. Make sure to log out of PostgreSQL and change user back to grader with: ` \q ` then ` exit `.
 
 Sources:
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-secure-postgresql-on-an-ubuntu-vps]
 ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
@@ -166,6 +169,7 @@ ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
 ```
 Source:
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
 ### Create virtual host config file
@@ -200,6 +204,7 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-f
    ` service apache2 reload `
 
 Source:
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
 
@@ -235,8 +240,8 @@ If not working with a virtual environment, just install the same dependencies gl
 10. Run *item_catalog_db.py* to set up database.
 
 Sources:
-Flask [http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/]
 
+Flask [http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/]
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
 
@@ -289,6 +294,7 @@ Restart Apache:
 Now you can visit your domain via https. Your webbrowser will give you a warning because self-signed SSL certificates are nor verifiable by a third=party certificate provider. This is for testing only. The amazonaws domain is not certifiable via third party!
 
 Source:
+
 Liquid Web [https://www.liquidweb.com/kb/how-to-create-a-self-signed-ssl-certificate-on-ubuntu/]
 
 # Extra
@@ -326,5 +332,6 @@ When installation is finished certbot will have created a new config file in the
 
 You can access your webpage now with https!
 
-Source: 
+Source:
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04]
