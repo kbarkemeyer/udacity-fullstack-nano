@@ -56,7 +56,6 @@ To check if firewall working correctly check:
 ` sudo ufw status `
 
 Source:
-
 Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
 
 ## Give 'grader' access
@@ -79,8 +78,8 @@ Change file permissions:
 4. Open sshd_config file with ` sudo nano /etc/ssh/sshd_config `. To **disable root login** change PermitRootLogin to no, to **inforce key-based authentication** change PasswordAuthentication to no. Save. Restart ssh with ` sudo service ssh restart `.
 
 Sources:
-
 Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart]
 
 ## Prepare server to deploy catalog app
@@ -90,9 +89,7 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-create-a-s
 Check timezone with ` date `. If not UTC change to UTC with ` sudo timedatectl set-timezone UTC `. 
 
 Source:
-
-Askubuntu 
-[https://askubuntu.com]
+Askubuntu [https://askubuntu.com]
 
 ### Install Apache
 
@@ -130,7 +127,6 @@ host    all             all             ::1/128                 md5
 8. Make sure to log out of PostgreSQL and change user back to grader with: ` \q ` then ` exit `.
 
 Sources:
-
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-secure-postgresql-on-an-ubuntu-vps]
 ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
@@ -170,7 +166,6 @@ ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
 ```
 Source:
-
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
 ### Create virtual host config file
@@ -205,8 +200,7 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-f
    ` service apache2 reload `
 
 Source:
-
-DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps#step-six-–-restart-apache]
+DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
 
 ### If you decide to use a virtual environment, install virtual environment with pip:
@@ -236,16 +230,14 @@ execfile(activate_this, dict(__file__=activate_this))
 
 This will activate your virtual environment.
 
+If not working with a virtual environment, just install the same dependencies globally.
+
+10. Run *item_catalog_db.py* to set up database.
+
 Sources:
-
 Flask [http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/]
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
-
-
-### If not working with a virtual environment, install dependencies globally.
-
-
-### Run *item_catalog_db.py* to set up database.
 
 
 ### Setting up secure login with Amazon/ Securing your webpage
@@ -268,6 +260,7 @@ First create a ssl directory:
 ` mkdir /etc/apache2/ssl `
 
 Then generate the SSL with openssl:
+
 ` openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt `
 
 This will create an output with question to answer. Answer the questions appropriately and most importantly enter your fully qualified domain name (FQDN).
@@ -277,9 +270,12 @@ Now you can enter the self-signed SSL certificate to Apache.
 Find ` VirtualHost _default_:443 ` then ` ServerAdmin webmaster@localhost ` and add your virtual host configuration on the next line:
 ` ServerName YOURFULLYQUALIFIEDDOMAINNAME.com:443 ` and replace YOURFULLYQUALIFIEDDOMAINNAME with your domain name (as specified in common name prior).
 Make sure the virtual host contains the following variables:
-``` SSLEngine on
+
+``` 
+SSLEngine on
 SSLCertificateFile /etc/apache2/ssl/apache.crt
-SSLCertificateKeyFile /etc/apache2/ssl/apache.key ```
+SSLCertificateKeyFile /etc/apache2/ssl/apache.key 
+```
 
 Activate virtual host:
 ` a2ensite default-ssl `
