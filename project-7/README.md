@@ -9,36 +9,55 @@ The objective of this project is to take a baseline installation of a Linux serv
 ## Server details:
 
 Static IP address: 34.214.247.249
+
 DNS name: karenbarkemeyer.com
+
 SSH port: 2200
+
 Webserver port: 443
 
 ## Securing the server:
 
 1. Updata all currently installed packages:
+
 ` sudo apt-get update `
+
 ` sudo apt-get upgrade `
 
 2. Change SSH port from 22 to 2200:
+
 Open sshd_config file with command:
+
 ` sudo nano /etc/ssh/sshd_config `
+
 Change SSH port to 2200 and save file.
+
 In the networking tab on Lightsail webside add custom firewall rule for port 2200.
 
 3. Configure Uncomplicated Firewall (UFW) to only allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123).
+
 ` sudo ufw default deny incoming `
+
 ` sudo ufw default allow outgoing `
 ` sudo ufw allow 2200/tcp `
+
 ` sudo ufw allow www `
+
 ` sudo ufw allow ntp `
+
 To confirm that correct setting have been added check with:
+
 ` sudo ufw show added `
+
 ` sudo ufw enable `
+
 To check if firewall working correctly check:
+
 ` sudo ufw status `
 
-source:
-Udacity Full Stack Nano Degree [classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
+Source:
+
+Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
 
 ## Give 'grader' access
 
@@ -50,14 +69,18 @@ Udacity Full Stack Nano Degree [classroom.udacity.com/nanodegrees/nd004/syllabus
 
 3. On your LOCAL machine create a pair of SSH keys with ` ssh-keygen `. Copy public key.
 On your your server change to user to grader with ` su - grader `. Create ssh directory with ` mkdir .ssh `. Create a new file with ` sudo nano .ssh/authorized_keys ` and paste public key into it. Save.
+
 Change file permissions:
+
 ` chmod 700 .ssh `
+
 ` chmod 644 .ssh/authorized_keys `
 
 4. Open sshd_config file with ` sudo nano /etc/ssh/sshd_config `. To **disable root login** change PermitRootLogin to no, to **inforce key-based authentication** change PasswordAuthentication to no. Save. Restart ssh with ` sudo service ssh restart `.
 
 Sources:
-Udacity Full Stack Nano Degree [classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
+
+Udacity Full Stack Nano Degree [https://classroom.udacity.com/nanodegrees/nd004/syllabus/core-curriculum]
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart]
 
 ## Prepare server to deploy catalog app
@@ -67,7 +90,9 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-create-a-s
 Check timezone with ` date `. If not UTC change to UTC with ` sudo timedatectl set-timezone UTC `. 
 
 Source:
-Askubuntu [askubuntu.com]
+
+Askubuntu 
+[https://askubuntu.com]
 
 ### Install Apache
 
@@ -80,16 +105,19 @@ Install Apache to serve Python mod-wsgi application
 1. Install PostgesSQL and create *catalog* user with limited permission
 ` sudo apt-get install postgresql postgresql-contrib ` 
 
-2.. Make sure remote connections are not allowed (default when first installing postgresql)
+2. Make sure remote connections are not allowed (default when first installing postgresql)
 ` sudo nano /etc/postgresql/9.5/main/pg_hba.conf `
 
 File should look like this:
-``` local   all             postgres                                peer ```
-``` local   all             all                                     peer ```
-``` host    all             all             127.0.0.1/32            md5 ```
-``` host    all             all             ::1/128                 md5 ```
 
-3.. Postgres has automatically created a  Linux user called *postgres*. Change to this user with ` sudo su - postgres `. To run PostgreSQL interactive terminal program type ` psql `.
+``` 
+local   all             postgres                                peer 
+local   all             all                                     peer 
+host    all             all             127.0.0.1/32            md5 
+host    all             all             ::1/128                 md5 
+```
+
+3. Postgres has automatically created a  Linux user called *postgres*. Change to this user with ` sudo su - postgres `. To run PostgreSQL interactive terminal program type ` psql `.
 
 4. Create a new user named 'catalog' with: ` CREATE USER catalog WITH PASSWORD 'yourpassword'; `
 
@@ -101,7 +129,8 @@ File should look like this:
 
 8. Make sure to log out of PostgreSQL and change user back to grader with: ` \q ` then ` exit `.
 
-Sources: 
+Sources:
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-secure-postgresql-on-an-ubuntu-vps]
 ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
@@ -119,9 +148,9 @@ ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
 4. Rename project-5 to FlaskApp: ` sudo mv project-5 FlaskApp `
 
-5. In FlaskApp rename *item-catalog_app.py* to *__init__.py*
+5. In FlaskApp rename *item-catalog_app.py* to *_init__.py*
 
-6. In *__init__.py* and *item_catalog_db.py* change *engine* to ` create_engine('postgresql://catalog:YOURPASSWORD@localhost/catalog') `
+6. In *_init_.py* and *item_catalog_db.py* change *engine* to ` create_engine('postgresql://catalog:YOURPASSWORD@localhost/catalog') `
 
 [The .git folder will be inaccessible from the web automatically. The only directory that can be listed in the browser is the static folder.]
 
@@ -141,7 +170,8 @@ ubuntu [https://help.ubuntu.com/community/PostgreSQL]
 
 ```
 Source:
-DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps#step-six-–-restart-apache]
+
+DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
 ### Create virtual host config file
 
@@ -175,6 +205,7 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-f
    ` service apache2 reload `
 
 Source:
+
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps#step-six-–-restart-apache]
 
 
@@ -198,12 +229,15 @@ DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-f
 
 9. Add the following lines to the top of your .wsgi file:
 
-``` activate_this = '/var/www/udacity-fullstack-nano/FlaskApp/venv/bin/activate_this.py'
-execfile(activate_this, dict(__file__=activate_this)) ```
+``` 
+activate_this = '/var/www/udacity-fullstack-nano/FlaskApp/venv/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this)) 
+```
 
 This will activate your virtual environment.
 
 Sources:
+
 Flask [http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/]
 DigitalOcean [https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps]
 
