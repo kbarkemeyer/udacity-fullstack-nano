@@ -6,7 +6,7 @@
 	<script type="text/javascript">
 
 	  window.onAmazonLoginReady = function() {
-	    amazon.Login.setClientId('amzn1.application-oa2-client.928aa4a57a6144cea15e83f4143bd9cf');
+	    amazon.Login.setClientId('AMAZON CLIENT ID');
 	  };
 	  (function(d) {
 	    var a = d.createElement('script'); a.type = 'text/javascript';
@@ -40,7 +40,7 @@
 	    options = {};
 	    options.scope = 'profile';
 	    options.state = '{{state}}';
-	    amazon.Login.authorize(options,	'http://localhost:5000/amazonconnect');
+	    amazon.Login.authorize(options,	'http:localhost:5000/amazonconnect');
 	    return false;
 	  };
 

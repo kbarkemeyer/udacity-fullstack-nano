@@ -31,6 +31,8 @@ The webpage includes the following features:
     "client_secret": "YOUR_AMAZON_CLIENT_SECRET"
   }
 }
+* In the Amazon developer console whitelist your localhost.
+* In the bookappLogin template enter your client id in line nine and possibly change the localhost port number in line 43.
 * To test this app locally:
 Navigate to the directory that contains the cloned code. Run item_catalog_db.py to create the database. In your terminal type 'export FLASK_APP=item_catalog_app.py', or for Windows 'set FLASK_APP=item_catalog_app.py' then 'flask run'. This launches a simple server for testing. Next head to localhost:5000 in your browser and view and test the web app.
 
