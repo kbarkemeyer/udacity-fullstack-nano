@@ -102,7 +102,7 @@ function initialize(param) {
                         data.pic = response.restaurants[0].restaurant.featured_image;
 
                         if (!(data.pic)) {
-                            data.pic = "Images/generic_photo.jpeg";
+                            data.pic = "images/generic_photo.jpeg";
                         }
 
                         // Create info window content.
